@@ -5729,6 +5729,27 @@ enum skl_power_gate {
 #define _DDI_DP_COMP_PAT_B			0x615F4
 #define DDI_DP_COMP_PAT(pipe, i)		_MMIO(_PIPE(pipe, _DDI_DP_COMP_PAT_A, _DDI_DP_COMP_PAT_B) + (i) * 4)
 
+/* DDI DP2 Compliance Control */
+#define _DDI_DP2_COMP_CTL_A			0x60600
+#define _DDI_DP2_COMP_CTL_B			0x61600
+#define DDI_DP2_COMP_CTL(pipe)			_MMIO_PIPE(pipe, _DDI_DP2_COMP_CTL_A, _DDI_DP2_COMP_CTL_B)
+#define   DDI_DP2_COMP_CTL_ENABLE		(1 << 31)
+#define   DDI_DP2_COMP_CTL_RESET_PAT		(1 << 30)
+#define   DDI_DP2_COMP_CTL_PRBS7		(2 << 24)
+#define   DDI_DP2_COMP_CTL_PRBS9		(3 << 24)
+#define   DDI_DP2_COMP_CTL_PRBS11		(4 << 24)
+#define   DDI_DP2_COMP_CTL_PRBS15		(5 << 24)
+#define   DDI_DP2_COMP_CTL_PRBS23		(6 << 24)
+#define   DDI_DP2_COMP_CTL_PRBS31		(7 << 24)
+#define   DDI_DP2_COMP_CTL_CUSTOM_264		(8 << 24)
+#define   DDI_DP2_COMP_CTL_SQUARE		(9 << 24)
+#define   DDI_DP2_COMP_CTL_SQUARE_WAVE_NUMBER	(0xFF << 16)
+
+/* DDI DP2 Compliance Custom Pattern*/
+#define _DDI_DP2_COMP_CUSTOM_A			0x60604
+#define _DDI_DP2_COMP_CUSTOM_B			0x61604
+#define DDI_DP2_COMP_CUSTOM(pipe, i)		_MMIO_PIPE(pipe, _DDI_DP2_COMP_CUSTOM_A, _DDI_DP2_COMP_CUSTOM_B)
+
 /* Sideband Interface (SBI) is programmed indirectly, via
  * SBI_ADDR, which contains the register offset; and SBI_DATA,
  * which contains the payload */
