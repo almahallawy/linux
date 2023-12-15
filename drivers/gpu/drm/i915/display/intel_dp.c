@@ -4861,7 +4861,7 @@ static void intel_dp_handle_test_request(struct intel_dp *intel_dp)
 		drm_dbg_kms(&i915->drm, "EDID test requested\n");
 		response = intel_dp_autotest_edid(intel_dp);
 		break;
-	case DP_TEST_LINK_PHY_TEST_PATTERN:
+	case DP_TEST_LINK_PHY_TEST_PATTERN | DP_TEST_PHY_TEST_CHANNEL_CODING_TYPE:
 		drm_dbg_kms(&i915->drm, "PHY_PATTERN test requested\n");
 		response = intel_dp_autotest_phy_pattern(intel_dp);
 		break;
@@ -5428,7 +5428,7 @@ intel_dp_short_pulse(struct intel_dp *intel_dp)
 		/* Send a Hotplug Uevent to userspace to start modeset */
 		drm_kms_helper_hotplug_event(&dev_priv->drm);
 		break;
-	case DP_TEST_LINK_PHY_TEST_PATTERN:
+	case DP_TEST_LINK_PHY_TEST_PATTERN | DP_TEST_PHY_TEST_CHANNEL_CODING_TYPE:
 		drm_dbg_kms(&dev_priv->drm,
 			    "PHY test pattern Compliance Test requested\n");
 		/*
