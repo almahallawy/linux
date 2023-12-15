@@ -4682,6 +4682,11 @@ static void intel_dp_phy_pattern_update(struct intel_dp *intel_dp,
 	struct intel_encoder *encoder = &dp_to_dig_port(intel_dp)->base;
 	enum pipe pipe = crtc->pipe;
 	u32 pattern_val;
+	bool uhbr = intel_dp_is_uhbr(crtc_state);
+
+	/* Disable compliance pattern first*/
+	intel_de_write(dev_priv, DDI_DP_COMP_CTL(pipe), 0x0);
+	intel_de_write(dev_priv, DDI_DP2_COMP_CTL(pipe), 0x0);
 
 	switch (data->phy_pattern) {
 	case DP_LINK_QUAL_PATTERN_DISABLE:
@@ -4705,8 +4710,12 @@ static void intel_dp_phy_pattern_update(struct intel_dp *intel_dp,
 		break;
 	case DP_LINK_QUAL_PATTERN_PRBS7:
 		drm_dbg_kms(&dev_priv->drm, "Set PRBS7 Phy Test Pattern\n");
-		intel_de_write(dev_priv, DDI_DP_COMP_CTL(pipe),
-			       DDI_DP_COMP_CTL_ENABLE | DDI_DP_COMP_CTL_PRBS7);
+		if (uhbr)
+			intel_de_write(dev_priv, DDI_DP2_COMP_CTL(pipe),
+				DDI_DP2_COMP_CTL_ENABLE | DDI_DP2_COMP_CTL_PRBS7);
+		else
+			intel_de_write(dev_priv, DDI_DP_COMP_CTL(pipe),
+				DDI_DP_COMP_CTL_ENABLE | DDI_DP_COMP_CTL_PRBS7);
 		break;
 	case DP_LINK_QUAL_PATTERN_80BIT_CUSTOM:
 		/*
@@ -4748,6 +4757,31 @@ static void intel_dp_phy_pattern_update(struct intel_dp *intel_dp,
 		intel_de_rmw(dev_priv, dp_tp_ctl_reg(encoder, crtc_state),
 			    DP_TP_CTL_TRAIN_PAT4_SEL_MASK | DP_TP_CTL_LINK_TRAIN_MASK,
 			    DP_TP_CTL_TRAIN_PAT4_SEL_TP4A | DP_TP_CTL_LINK_TRAIN_PAT4);
+		break;
+	case DP_LINK_QUAL_PATTERN_PRSBS9:
+		drm_dbg_kms(&dev_priv->drm, "Set PRSBS9  Phy Test Pattern\n");
+		intel_de_write(dev_priv, DDI_DP2_COMP_CTL(pipe),
+			       DDI_DP2_COMP_CTL_ENABLE | DDI_DP2_COMP_CTL_PRBS9);
+		break;
+	case DP_LINK_QUAL_PATTERN_PRSBS11:
+		drm_dbg_kms(&dev_priv->drm, "Set PRSBS11  Phy Test Pattern\n");
+		intel_de_write(dev_priv, DDI_DP2_COMP_CTL(pipe),
+			       DDI_DP2_COMP_CTL_ENABLE | DDI_DP2_COMP_CTL_PRBS11);
+		break;
+	case DP_LINK_QUAL_PATTERN_PRSBS15:
+		drm_dbg_kms(&dev_priv->drm, "Set PRSBS15  Phy Test Pattern\n");
+		intel_de_write(dev_priv, DDI_DP2_COMP_CTL(pipe),
+			       DDI_DP2_COMP_CTL_ENABLE | DDI_DP2_COMP_CTL_PRBS15);
+		break;
+	case DP_LINK_QUAL_PATTERN_PRSBS23:
+		drm_dbg_kms(&dev_priv->drm, "Set PRSBS23  Phy Test Pattern\n");
+		intel_de_write(dev_priv, DDI_DP2_COMP_CTL(pipe),
+			       DDI_DP2_COMP_CTL_ENABLE | DDI_DP2_COMP_CTL_PRBS23);
+		break;
+	case DP_LINK_QUAL_PATTERN_PRSBS31:
+		drm_dbg_kms(&dev_priv->drm, "Set PRSBS31  Phy Test Pattern\n");
+		intel_de_write(dev_priv, DDI_DP2_COMP_CTL(pipe),
+			       DDI_DP2_COMP_CTL_ENABLE | DDI_DP2_COMP_CTL_PRBS31);
 		break;
 	default:
 		drm_warn(&dev_priv->drm, "Invalid Phy Test Pattern\n");
