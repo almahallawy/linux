@@ -5392,6 +5392,8 @@ intel_dp_short_pulse(struct intel_dp *intel_dp)
 	struct drm_i915_private *dev_priv = dp_to_i915(intel_dp);
 	u8 old_sink_count = intel_dp->sink_count;
 	bool ret;
+	struct intel_digital_port *dig_port = dp_to_dig_port(intel_dp);
+	struct intel_encoder *encoder = &dig_port->base;
 
 	/*
 	 * Clearing compliance test variables to allow capturing
@@ -5440,7 +5442,8 @@ intel_dp_short_pulse(struct intel_dp *intel_dp)
 		 * FIXME get rid of the ad-hoc phy test modeset code
 		 * and properly incorporate it into the normal modeset.
 		 */
-		return false;
+		intel_dp_phy_test(encoder);
+		break;
 	}
 
 	return true;
