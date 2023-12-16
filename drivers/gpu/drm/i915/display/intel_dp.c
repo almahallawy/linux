@@ -4865,6 +4865,7 @@ static void intel_dp_handle_test_request(struct intel_dp *intel_dp)
 		break;
 	case DP_TEST_LINK_PHY_TEST_PATTERN | DP_TEST_PHY_TEST_CHANNEL_CODING_TYPE:
 		drm_dbg_kms(&i915->drm, "PHY_PATTERN test requested\n");
+		drm_dp_dpcd_writeb(&intel_dp->aux, DP_TEST_RESPONSE, DP_TEST_ACK);
 		response = intel_dp_autotest_phy_pattern(intel_dp);
 		break;
 	default:
