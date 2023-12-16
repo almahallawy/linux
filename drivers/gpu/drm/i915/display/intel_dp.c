@@ -4810,11 +4810,13 @@ static void intel_dp_process_phy_request(struct intel_dp *intel_dp,
 
 	intel_dp_phy_pattern_update(intel_dp, crtc_state);
 
-	drm_dp_dpcd_write(&intel_dp->aux, DP_TRAINING_LANE0_SET,
-			  intel_dp->train_set, crtc_state->lane_count);
-
 	drm_dp_set_phy_test_pattern(&intel_dp->aux, data,
 				    intel_dp->dpcd[DP_DPCD_REV]);
+
+	drm_dp_dpcd_writeb(&intel_dp->aux, DP_TRAINING_PATTERN_SET, DP_TRAINING_PATTERN_DISABLE);
+
+	drm_dp_dpcd_write(&intel_dp->aux, DP_TRAINING_LANE0_SET,
+			  intel_dp->train_set, crtc_state->lane_count);
 }
 
 static u8 intel_dp_autotest_phy_pattern(struct intel_dp *intel_dp)
