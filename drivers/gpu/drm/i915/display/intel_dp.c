@@ -6135,6 +6135,7 @@ intel_dp_hpd_pulse(struct intel_digital_port *dig_port, bool long_hpd)
 {
 	struct drm_i915_private *i915 = to_i915(dig_port->base.base.dev);
 	struct intel_dp *intel_dp = &dig_port->dp;
+	u8 val;
 
 	if (dig_port->base.type == INTEL_OUTPUT_EDP &&
 	    (long_hpd || !intel_pps_have_panel_power_or_vdd(intel_dp))) {
@@ -6162,9 +6163,21 @@ intel_dp_hpd_pulse(struct intel_digital_port *dig_port, bool long_hpd)
 		return IRQ_NONE;
 	}
 
+	drm_dp_dpcd_readb(&intel_dp->aux,
+			DP_DEVICE_SERVICE_IRQ_VECTOR, &val) ;
+
+	/* Handle the case of DP2.1 Compliance with MST DPRX aux emulator UCD-323*/
+	if (val & DP_AUTOMATED_TEST_REQUEST) {
+		DRM_ERROR("I915-DEBUG: %s %d PHY CTS\n", __FUNCTION__, __LINE__);
+		if (!intel_dp_short_pulse(intel_dp)) {
+			return IRQ_NONE;
+		}
+	}
+
 	if (intel_dp->is_mst) {
 		if (!intel_dp_check_mst_status(intel_dp))
 			return IRQ_NONE;
+		DRM_ERROR("I915-DEBUG: %s %d MST status\n", __FUNCTION__, __LINE__);
 	} else if (!intel_dp_short_pulse(intel_dp)) {
 		return IRQ_NONE;
 	}
