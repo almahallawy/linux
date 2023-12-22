@@ -4781,6 +4781,8 @@ static void intel_dp_phy_pattern_update(struct intel_dp *intel_dp,
 	enum pipe pipe = crtc->pipe;
 	u32 pattern_val;
 	bool uhbr = intel_dp_is_uhbr(crtc_state);
+	u8 val = 0;
+	int err;
 
 	/* Disable compliance pattern first*/
 	intel_de_write(dev_priv, DDI_DP_COMP_CTL(pipe), 0x0);
@@ -4880,6 +4882,20 @@ static void intel_dp_phy_pattern_update(struct intel_dp *intel_dp,
 		drm_dbg_kms(&dev_priv->drm, "Set PRSBS31  Phy Test Pattern\n");
 		intel_de_write(dev_priv, DDI_DP2_COMP_CTL(pipe),
 			       DDI_DP2_COMP_CTL_ENABLE | DDI_DP2_COMP_CTL_PRBS31);
+		break;
+	case DP_LINK_QUAL_PATTERN_SQUARE:
+	case DP_LINK_QUAL_PATTERN_SQUARE_PRESHOOT_DISABLED:
+	case DP_LINK_QUAL_PATTERN_SQUARE_DEEMPHASIS_DISABLED:
+	case DP_LINK_QUAL_PATTERN_SQUARE_PRESHOOT_DEEMPHASIS_DISABLED:
+		drm_dbg_kms(&dev_priv->drm, "Set Square  Phy Test Pattern %0x\n", data->phy_pattern);
+		err = drm_dp_dpcd_readb(&intel_dp->aux, DP_PHY_SQUARE_PATTERN, &val);
+		if (err < 0)
+			DRM_ERROR("I915-DEBUG: %s %d error reading DP_PHY_SQUARE_PATTERN\n", __FUNCTION__, __LINE__);
+		else
+			DRM_ERROR("I915-DEBUG: %s %d sq_num=%d\n", __FUNCTION__, __LINE__, val);
+		intel_de_write(dev_priv, DDI_DP2_COMP_CTL(pipe),
+			       DDI_DP2_COMP_CTL_ENABLE | DDI_DP2_COMP_CTL_SQUARE | val);
+		drm_dp_dpcd_writeb(&intel_dp->aux, DP_TRAINING_LANE0_1_SET2, val);
 		break;
 	default:
 		drm_warn(&dev_priv->drm, "Invalid Phy Test Pattern\n");
