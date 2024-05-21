@@ -5510,6 +5510,8 @@ intel_dp_short_pulse(struct intel_dp *intel_dp)
 	u8 old_sink_count = intel_dp->sink_count;
 	bool reprobe_needed = false;
 	bool ret;
+	struct intel_digital_port *dig_port = dp_to_dig_port(intel_dp);
+	struct intel_encoder *encoder = &dig_port->base;
 
 	/*
 	 * Clearing compliance test variables to allow capturing
@@ -5558,7 +5560,8 @@ intel_dp_short_pulse(struct intel_dp *intel_dp)
 		 * FIXME get rid of the ad-hoc phy test modeset code
 		 * and properly incorporate it into the normal modeset.
 		 */
-		reprobe_needed = true;
+		intel_dp_phy_test(encoder);
+		break;
 	}
 
 	return !reprobe_needed;
