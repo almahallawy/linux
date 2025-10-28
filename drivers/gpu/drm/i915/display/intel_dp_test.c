@@ -407,7 +407,7 @@ void intel_dp_test_request(struct intel_dp *intel_dp)
 		drm_dbg_kms(display->drm, "EDID test requested\n");
 		response = intel_dp_autotest_edid(intel_dp);
 		break;
-	case DP_TEST_LINK_PHY_TEST_PATTERN:
+	case DP_TEST_LINK_PHY_TEST_PATTERN | DP_TEST_PHY_TEST_CHANNEL_CODING_TYPE:
 		drm_dbg_kms(display->drm, "PHY_PATTERN test requested\n");
 		response = intel_dp_autotest_phy_pattern(intel_dp);
 		break;
@@ -559,7 +559,7 @@ bool intel_dp_test_short_pulse(struct intel_dp *intel_dp)
 		intel_dp->link.force_retrain = 1;
 		intel_hpd_trigger_irq(dp_to_dig_port(intel_dp));
 		break;
-	case DP_TEST_LINK_PHY_TEST_PATTERN:
+	case DP_TEST_LINK_PHY_TEST_PATTERN | DP_TEST_PHY_TEST_CHANNEL_CODING_TYPE:
 		drm_dbg_kms(display->drm,
 			    "PHY test pattern Compliance Test requested\n");
 		intel_dp_test_phy(intel_dp);
