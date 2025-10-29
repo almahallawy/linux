@@ -214,12 +214,15 @@ static void intel_dp_phy_pattern_update(struct intel_dp *intel_dp,
 
 	/* Disable compliance pattern first*/
 	intel_de_write(display, DDI_DP_COMP_CTL(pipe), 0x0);
-	intel_de_write(display, DDI_DP2_COMP_CTL(pipe), 0x0);
+	if (DISPLAY_VER(display) >= 14)
+	  intel_de_write(display, DDI_DP2_COMP_CTL(pipe), 0x0);
 
 	switch (data->phy_pattern) {
 	case DP_LINK_QUAL_PATTERN_DISABLE:
 		drm_dbg_kms(display->drm, "Disable Phy Test Pattern\n");
 		intel_de_write(display, DDI_DP_COMP_CTL(pipe), 0x0);
+		if (DISPLAY_VER(display) >= 14)
+			intel_de_write(display, DDI_DP2_COMP_CTL(pipe), 0x0);
 		if (DISPLAY_VER(display) >= 10)
 			intel_de_rmw(display, dp_tp_ctl_reg(encoder, crtc_state),
 				     DP_TP_CTL_TRAIN_PAT4_SEL_MASK | DP_TP_CTL_LINK_TRAIN_MASK,
