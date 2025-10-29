@@ -3819,7 +3819,18 @@ static void intel_ddi_set_link_train(struct intel_dp *intel_dp,
 {
 	struct intel_display *display = to_intel_display(intel_dp);
 	struct intel_encoder *encoder = &dp_to_dig_port(intel_dp)->base;
+	struct intel_crtc *crtc = to_intel_crtc(crtc_state->uapi.crtc);
+	enum pipe pipe = crtc->pipe;
 	u32 temp;
+
+	/*Disable PHY Patterns*/
+	intel_de_write(display, DDI_DP_COMP_CTL(pipe), 0x0);
+	if (DISPLAY_VER(display) >= 14)
+	  intel_de_write(display, DDI_DP2_COMP_CTL(pipe), 0x0);
+	if (DISPLAY_VER(display) >= 10)
+	  intel_de_rmw(display, dp_tp_ctl_reg(encoder, crtc_state),
+		       DP_TP_CTL_TRAIN_PAT4_SEL_MASK | DP_TP_CTL_LINK_TRAIN_MASK,
+		       DP_TP_CTL_LINK_TRAIN_NORMAL);
 
 	temp = intel_de_read(display, dp_tp_ctl_reg(encoder, crtc_state));
 
