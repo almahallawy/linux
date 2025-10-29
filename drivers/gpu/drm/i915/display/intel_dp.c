@@ -6034,18 +6034,6 @@ intel_dp_detect(struct drm_connector *_connector,
 	else
 		status = connector_status_disconnected;
 
-	if (status != connector_status_disconnected &&
-	    !intel_dp_mst_verify_dpcd_state(intel_dp))
-		/*
-		 * This requires retrying detection for instance to re-enable
-		 * the MST mode that got reset via a long HPD pulse. The retry
-		 * will happen either via the hotplug handler's retry logic,
-		 * ensured by setting the connector here to SST/disconnected,
-		 * or via a userspace connector probing in response to the
-		 * hotplug uevent sent when removing the MST connectors.
-		 */
-		status = connector_status_disconnected;
-
 	if (status == connector_status_disconnected) {
 		intel_dp_test_reset(intel_dp);
 		memset(connector->dp.dsc_dpcd, 0, sizeof(connector->dp.dsc_dpcd));
