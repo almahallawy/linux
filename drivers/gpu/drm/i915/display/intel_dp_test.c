@@ -25,7 +25,12 @@ void intel_dp_test_reset(struct intel_dp *intel_dp)
 	 * Clearing compliance test variables to allow capturing
 	 * of values for next automated test request.
 	 */
-	memset(&intel_dp->compliance, 0, sizeof(intel_dp->compliance));
+	intel_dp->compliance.test_type = 0;
+	memset(&intel_dp->compliance.test_data, 0,
+	       sizeof(intel_dp->compliance.test_data));
+	intel_dp->compliance.test_active = false;
+	intel_dp->compliance.test_link_rate = 0;
+	intel_dp->compliance.test_lane_count = 0;
 }
 
 /* Adjust link config limits based on compliance test requests. */
@@ -345,6 +350,15 @@ static void intel_dp_process_phy_request(struct intel_dp *intel_dp,
 		&intel_dp->compliance.test_data.phytest;
 	u8 link_status[DP_LINK_STATUS_SIZE];
 
+	/* Read PHY test params fresh from DPCD to avoid races with
+	 * intel_dp_test_reset() clearing cached compliance data.
+	 */
+	if (drm_dp_get_phy_test_pattern(&intel_dp->aux, data)) {
+		drm_dbg_kms(display->drm,
+			    "failed to get phy test pattern from DPCD\n");
+		return;
+	}
+
 	if (drm_dp_dpcd_read_phy_link_status(&intel_dp->aux, DP_PHY_DPRX,
 					     link_status) < 0) {
 		drm_dbg_kms(display->drm, "failed to get link status\n");
@@ -524,6 +538,20 @@ static int intel_dp_do_phy_test(struct intel_encoder *encoder,
 	return 0;
 }
 
+static void intel_dp_phy_test_work_fn(struct work_struct *work)
+{
+	struct intel_dp *intel_dp =
+		container_of(work, struct intel_dp, compliance.phy_test_work);
+
+	intel_dp_test_phy(intel_dp);
+}
+
+void intel_dp_test_init(struct intel_dp *intel_dp)
+{
+	INIT_WORK(&intel_dp->compliance.phy_test_work,
+		  intel_dp_phy_test_work_fn);
+}
+
 bool intel_dp_test_phy(struct intel_dp *intel_dp)
 {
 	struct intel_digital_port *dig_port = dp_to_dig_port(intel_dp);
@@ -569,7 +597,7 @@ bool intel_dp_test_short_pulse(struct intel_dp *intel_dp)
 	case DP_TEST_LINK_PHY_TEST_PATTERN | DP_TEST_PHY_TEST_CHANNEL_CODING_TYPE:
 		drm_dbg_kms(display->drm,
 			    "PHY test pattern Compliance Test requested\n");
-		intel_dp_test_phy(intel_dp);
+		schedule_work(&intel_dp->compliance.phy_test_work);
 		break;
 	}
 

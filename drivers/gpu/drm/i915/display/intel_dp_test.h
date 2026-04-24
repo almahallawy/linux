@@ -18,6 +18,7 @@ void intel_dp_test_compute_config(struct intel_dp *intel_dp,
 				  struct link_config_limits *limits);
 bool intel_dp_test_phy(struct intel_dp *intel_dp);
 bool intel_dp_test_short_pulse(struct intel_dp *intel_dp);
+void intel_dp_test_init(struct intel_dp *intel_dp);
 void intel_dp_test_debugfs_register(struct intel_display *display);
 
 #endif /* __INTEL_DP_TEST_H__ */

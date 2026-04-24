@@ -1687,6 +1687,7 @@ struct intel_dp_compliance {
 	bool test_active;
 	int test_link_rate;
 	u8 test_lane_count;
+	struct work_struct phy_test_work;
 };
 
 struct intel_dp_pcon_frl {

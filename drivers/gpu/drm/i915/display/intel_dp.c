@@ -6639,6 +6639,8 @@ void intel_dp_encoder_flush_work(struct drm_encoder *_encoder)
 
 	intel_encoder_link_check_flush_work(encoder);
 
+	cancel_work_sync(&intel_dp->compliance.phy_test_work);
+
 	intel_dp_mst_encoder_cleanup(dig_port);
 
 	intel_dp_tunnel_destroy(intel_dp);
@@ -7266,6 +7268,7 @@ intel_dp_init_connector(struct intel_digital_port *dig_port,
 		vlv_pps_pipe_init(intel_dp);
 
 	intel_dp_aux_init(intel_dp);
+	intel_dp_test_init(intel_dp);
 	connector->dp.dsc_decompression_aux = &intel_dp->aux;
 
 	drm_dbg_kms(display->drm,
